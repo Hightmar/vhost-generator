@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apacheSuffix=apache.conf
-nginxSuffix=nginx
+nginxSuffix=nginx.conf
 
 read -p "vHost name (domain): " serverName
 read -p "Alias name: " aliasName

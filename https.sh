@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apacheSuffix=apache.conf
-nginxSuffix=nginx
+nginxSuffix=nginx.conf
 
 echo "################################################"
 echo "##    CERTIFICATES LET'S ENCRYPT CREATED ?    ##"
