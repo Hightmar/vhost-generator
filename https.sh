@@ -17,44 +17,52 @@ while true; do
 done
 
 if [ $cerbotUsed == "y" ]; then
-  while true; do
-      read -p "Activate on Apache or Nginx ? " servWeb
-      case $servWeb in
-          "apache" ) servWeb="apache" break;;
-          "nginx" ) servWeb="nginx" break;;
-          * ) echo "Apache ou Nginx.";;
-      esac
-  done
+    while true; do
+        read -p "Activate on Apache or Nginx ? " servWeb
+        case $servWeb in
+            "apache" ) servWeb="apache" break;;
+            "nginx" ) servWeb="nginx" break;;
+            * ) echo "Apache ou Nginx.";;
+        esac
+    done
 
-  read -p "Which vHost to edit ? " siteName
+    read -p "Which vHost to edit ? " siteName
 
-  while true; do
-      read -p "Activate HSTS ? (y/n)" hsts
-      case $hsts in
-          [Yy]* ) hsts="y" break;;
-          [Nn]* ) hsts="n" break;;
-          * ) echo "Yes, y/No, n.";;
-      esac
-  done
+    while true; do
+        read -p "Activate HSTS ? (y/n)" hsts
+        case $hsts in
+            [Yy]* ) hsts="y" break;;
+            [Nn]* ) hsts="n" break;;
+            * ) echo "Yes, y/No, n.";;
+        esac
+    done
 
-  if [ $servWeb == "apache" ]; then
-    vHostEdit=/etc/apache2/sites-enabled/$siteName.$apacheSuffix
-  else
-    vHostEdit=/etc/nginx/sites-enabled/$siteName.$nginxSuffix
-  fi
+    if [ $servWeb == "apache" ]; then
+        vHostEdit=/etc/apache2/sites-enabled/$siteName.$apacheSuffix
+    else
+        vHostEdit=/etc/nginx/sites-enabled/$siteName.$nginxSuffix
+    fi
 
-  sed -i 's/#https//' $vHostEdit
-  sed -i '4d' $vHostEdit
+    sed -i 's/#https//' $vHostEdit
+    sed -i '4d' $vHostEdit
 
-  if [ $hsts == "y" ]; then
-    sed -i 's/#hsts//' $vHostEdit
-  fi
+    if [ $hsts == "y" ]; then
+        sed -i 's/#hsts//' $vHostEdit
+    fi
 
-  if [ $servWeb == "apache" ]; then
-    sudo systemctl restart apache2
-  else
-    sudo systemctl reload nginx
-  fi
+    if [ $servWeb == "apache" ]; then
+        sudo systemctl restart apache2
+    else
+        sudo systemctl reload nginx
+    fi
+
+    if [ $moreVHost == "y" ]; then
+        addMoreVHost=$(readlink -f "$0")
+        exec $addMoreVHost
+    else
+        exit
+    fi
+
 else
-  echo "Create Let's Encrypt certificates first (see CertBot)"
+    echo "Create Let's Encrypt certificates first (see CertBot)"
 fi
