@@ -65,4 +65,36 @@ if [ $cerbotUsed == "y" ]; then
 
 else
     echo "Create Let's Encrypt certificates first (see CertBot)"
+    while true; do
+        read -p "Start Cerbot ? (y/n)" certbot
+        case $certbot in
+            [Yy]* ) certbot="y" break;;
+            [Nn]* ) cerbot="n" break;;
+            * ) echo "Yes, y/No, n.";;
+        esac
+    done
+
+    if [ $certbot == "y" ]; then
+      while true; do
+        read -p "Which webserver ? (apache/nginx/exit)" certServWeb
+        case $certServWeb in
+            "apache" ) certServWeb="apache" break;;
+            "nginx" ) certServWeb="nginx" break;;
+            "exit" ) exit;;
+            * ) echo "apache or nginx";;
+        esac
+      done
+
+      if [ $certServWeb == "apache" ]; then
+#        sudo certbot certonly --apache
+        enableCert=$(readlink -f "$0")
+        exec $enableCert
+      else
+        sudo certbot certonly --nginx
+        enableCert=$(readlink -f "$0")
+        exec $enableCert
+      fi
+    fi
 fi
+
+
