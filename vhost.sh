@@ -24,7 +24,25 @@ if [ $doApache == "y" ]; then
     defaultApache=/etc/apache2/site-available/000-default-script.$apacheSuffix
     vHostApache=/etc/apache2/site-available/$serverName.$apacheSuffix
 
+    while true; do
+      read -p "Used with reverse proxy ?" reverse
+      case $reverse in
+          [Yy] ) reverse="y" break;;
+          [Nn] ) reverse="n" break;;
+          * ) echo "Yes or No";;
+      esac
+    done
+
     cp $defaultApache $vHostApache
+
+    if [ $reverse == "y" ]; then
+      read -p "Port used by Apache :" portUsed
+      sed -i 's/${portUsed}/'$portUsed'/' $vHostApache
+    else
+      portUsed="80"
+      sed -i 's/${portUsed}/'$portUsed'/' $vHostApache
+    fi
+
     sed -i 's/${serverName}/'$serverName'/' $vHostApache
     sed -i 's/${aliasName}/'$aliasName'/' $vHostApache
     sed -i 's~${documentRoot}~'$documentRoot'~' $vHostApache

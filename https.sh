@@ -26,7 +26,7 @@ if [ $cerbotUsed == "y" ]; then
         esac
     done
 
-    read -p "Which vHost to edit ? " siteName
+    read -p "Which vHost to edit ? (name without suffix)" siteName
 
     while true; do
         read -p "Activate HSTS ? (y/n)" hsts
