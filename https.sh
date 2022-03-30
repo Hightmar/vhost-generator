@@ -3,6 +3,9 @@
 apacheSuffix=apache.conf
 nginxSuffix=nginx.conf
 
+pathSiteAvailabeNginx="/etc/nginx/sites-available"
+pathSiteAvailabeApache="/etc/apache2/sites-available"
+
 echo "################################################"
 echo "##    CERTIFICATES LET'S ENCRYPT CREATED ?    ##"
 echo "################################################"
@@ -42,7 +45,7 @@ if [ $cerbotUsed == "y" ]; then
     ##
 
     if [ $servWeb == "apache" ]; then
-      vHostEdit=$siteName.$apacheSuffix
+      vHostEdit=$pathSiteAvailabeApache/$siteName.$apacheSuffix
       source generated_vhost/$vHostEdit.variables
 
       sed -i '/\/VirtualHost/d' $vHostEdit
@@ -69,7 +72,7 @@ if [ $cerbotUsed == "y" ]; then
     ##
 
     if [ $servWeb == "nginx" ]; then
-      vHostEdit=$siteName.$nginxSuffix
+      vHostEdit=$pathSiteAvailabeNginx/$siteName.$nginxSuffix
       source generated_vhost/$vHostEdit.variables
 
       cat base_vhost/nginx/ssl >> $vHostEdit

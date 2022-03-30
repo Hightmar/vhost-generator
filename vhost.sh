@@ -1,7 +1,14 @@
 #!/bin/bash
 
+if [ ! -d generated_vhost ];then
+   mkdir generated_vhost
+fi
+
 apacheSuffix=apache.conf
 nginxSuffix=nginx.conf
+
+pathSiteAvailabeNginx="/etc/nginx/sites-available"
+pathSiteAvailabeApache="/etc/apache2/sites-available"
 
 read -p "vHost name (domain): " serverName
 read -p "Alias name: " aliasName
@@ -21,7 +28,7 @@ done
 
 if [ $doApache == "y" ]; then
 
-  vHostApache=$serverName.$apacheSuffix
+  vHostApache=$pathSiteAvailabeApache/$serverName.$apacheSuffix
   touch $vHostApache
   cat base_vhost/apache/base >> $vHostApache
 
@@ -71,7 +78,7 @@ done
 
 if [ $doNginx == "y" ]; then
 
-  vHostNginx=$serverName.$nginxSuffix
+  vHostNginx=$pathSiteAvailabeNginx/$serverName.$nginxSuffix
   touch $vHostNginx
   cat base_vhost/nginx/base >> $vHostNginx
 
