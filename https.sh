@@ -26,10 +26,10 @@ if [ $cerbotUsed == "y" ]; then
         esac
     done
 
-    read -p "Which vHost to edit ? (name without suffix)" siteName
+    read -p "Which vHost to edit ? (name without suffix) " siteName
 
     while true; do
-        read -p "Activate HSTS ? (y/n)" hsts
+        read -p "Activate HSTS ? (y/n) " hsts
         case $hsts in
             [Yy]* ) hsts="y" break;;
             [Nn]* ) hsts="n" break;;
@@ -37,30 +37,77 @@ if [ $cerbotUsed == "y" ]; then
         esac
     done
 
+    ##
+    # APACHE2
+    ##
+
     if [ $servWeb == "apache" ]; then
-        vHostEdit=/etc/apache2/sites-enabled/$siteName.$apacheSuffix
-    else
-        vHostEdit=/etc/nginx/sites-enabled/$siteName.$nginxSuffix
-    fi
+      vHostEdit=$siteName.$apacheSuffix
+      source generated_vhost/$vHostEdit.variables
 
-    sed -i 's/#https//' $vHostEdit
-    sed -i '4d' $vHostEdit
+      sed -i '/\/VirtualHost/d' $vHostEdit
+      sed -i '/#deleteifhttps/d' $vHostEdit
 
-    if [ $hsts == "y" ]; then
+      cat base_vhost/apache/ssl >> $vHostEdit
+
+      sed -i 's/${serverName}/'$serverName'/' $vHostEdit
+      sed -i 's/${aliasName}/'$aliasName'/' $vHostEdit
+      sed -i 's~${documentRoot}~'$documentRoot'~' $vHostEdit
+
+      if [ $hsts == "y" ]; then
         sed -i 's/#hsts//' $vHostEdit
+      else
+        sed -i '/#hsts/d' $vHostEdit
+      fi
+
+      sudo systemctl restart apache2
+      echo "vhost updated to handle HTTPS on Apache"
     fi
 
-    if [ $servWeb == "apache" ]; then
-        sudo systemctl restart apache2
-    else
-        sudo systemctl reload nginx
-    fi
+    ##
+    # NGINX
+    ##
 
-    if [ $moreVHost == "y" ]; then
-        addMoreVHost=$(readlink -f "$0")
-        exec $addMoreVHost
-    else
-        exit
+    if [ $servWeb == "nginx" ]; then
+      vHostEdit=$siteName.$nginxSuffix
+      source generated_vhost/$vHostEdit.variables
+
+      sed -i '/#end/d' $vHostEdit
+      sed -i '/#deleteifhttps/d' $vHostEdit
+
+      cat base_vhost/nginx/ssl >> $vHostEdit
+
+      sed -i 's/${serverName}/'$serverName'/' $vHostEdit
+      sed -i 's/${aliasName}/'$aliasName'/' $vHostEdit
+      sed -i 's~${documentRoot}~'$documentRoot'~' $vHostEdit
+
+      if [ $hsts == "y" ]; then
+        sed -i 's/#hsts//' $vHostEdit
+      else
+        sed -i '/#hsts/d' $vHostEdit
+      fi
+
+      phpUsed=$(cat $vHostEdit | grep fastcgi_pass)
+
+      if [ -n "$phpUsed" ]; then
+        sed -i '/#end/d' $vHostEdit
+        cat base_vhost/nginx/php >> $vHostEdit
+        sed -i 's/${phpVersion}/'$phpVersion'/' $vHostEdit
+
+      elif [ -z "$phpUsed" ]; then
+        phpUsed=$(cat $vHostEdit | grep proxy_pass)
+
+        if [ -n "$phpUsed" ]; then
+          sed -i '/#end/d' $vHostEdit
+          cat base_vhost/nginx/phpreverse >> $vHostEdit
+          sed -i 's/${ipToSend}/'$ipToSend'/' "$vHostEdit"
+          sed -i 's/${portToSend}/'$portToSend'/' "$vHostEdit"
+        fi
+      fi
+
+      sudo systemctl restard nginx
+      echo "vhost updated to handle HTTPS on NGINX"
+      rm generated_vhost/$vHostEdit.variables
     fi
 
 else
@@ -76,7 +123,7 @@ else
 
     if [ $certbot == "y" ]; then
       while true; do
-        read -p "Which webserver ? (apache/nginx/exit)" certServWeb
+        read -p "Which webserver ? (apache/nginx/exit) " certServWeb
         case $certServWeb in
             "apache" ) certServWeb="apache" break;;
             "nginx" ) certServWeb="nginx" break;;

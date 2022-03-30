@@ -1,0 +1,40 @@
+
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name ${serverName} ${aliasName};
+    root ${documentRoot};
+    index index.php index.html index.htm index.php;
+
+    # SSL Cerbot
+    ssl_certificate /etc/letsencrypt/live/${serverName}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/${serverName}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    add_header X-Frame-Options SAMEORIGIN;
+#hsts    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+	add_header Referrer-Policy "same-origin";
+
+    location ~* \.(class|css|csv|doc|docx|ejs|eot|eps|jar|js|mid|midi|otf|pdf|pls|ppt|pptx|ps|svgz|tiff|ttf|txt|webp|woff|woff2|xls|xlsx)$ {
+        try_files $uri =404;
+    }
+
+    # Media: images, icons, video, audio, HTC
+        location ~*  \.(jpg|jpeg|png|gif|ico|pdf|txt|bmp|webp|svg|ttf|otf|eot|woff)$ {
+        expires 30d;access_log off;
+	    add_header Cache-Control "public";
+    }
+
+    # CSS and Javascript
+    location ~* \.(?:css|js)$ {
+        expires 1y;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+} #end (comment needed for script)

@@ -1,0 +1,11 @@
+<VirtualHost *:${portUsed}>
+	Protocols h2 http/1.1
+    ServerName ${serverName}
+    ServerAlias ${aliasName}
+    DocumentRoot ${documentRoot}
+
+	<Directory ${documentRoot}> #deleteifhttps
+            AllowOverride All   #deleteifhttps
+	</Directory>                #deleteifhttps
+
+</VirtualHost>

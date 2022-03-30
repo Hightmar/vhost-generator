@@ -1,0 +1,25 @@
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+</VirtualHost>
+
+<VirtualHost *:443>
+    Protocols h2 http/1.1
+    ServerName ${serverName}
+    ServerAlias ${aliasName}
+    DocumentRoot ${documentRoot}
+
+	<Directory ${documentRoot}>
+            AllowOverride All
+	</Directory>
+
+   SSLEngine on
+   SSLCertificateFile      /etc/letsencrypt/live/${serverName}/fullchain.pem
+   SSLCertificateKeyFile   /etc/letsencrypt/${serverName}/privkey.pem
+
+
+#hsts   Header always set Strict-Transport-Security "max-age=63072000"
+   Header set X-Content-Type-Options nosniff
+   Header set X-XSS-Protection "1; mode=block"
+   Header always set X-Frame-Options "SAMEORIGIN"
+   Header always set Referrer-Policy "strict-origin"
+
+</VirtualHost>
