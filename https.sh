@@ -72,9 +72,6 @@ if [ $cerbotUsed == "y" ]; then
       vHostEdit=$siteName.$nginxSuffix
       source generated_vhost/$vHostEdit.variables
 
-      sed -i '/#end/d' $vHostEdit
-      sed -i '/#deleteifhttps/d' $vHostEdit
-
       cat base_vhost/nginx/ssl >> $vHostEdit
 
       sed -i 's/${serverName}/'$serverName'/' $vHostEdit
@@ -90,18 +87,22 @@ if [ $cerbotUsed == "y" ]; then
       phpUsed=$(cat $vHostEdit | grep fastcgi_pass)
 
       if [ -n "$phpUsed" ]; then
+        sed -i '/#deleteifhttps/d' $vHostEdit
         sed -i '/#end/d' $vHostEdit
         cat base_vhost/nginx/php >> $vHostEdit
         sed -i 's/${phpVersion}/'$phpVersion'/' $vHostEdit
+        sed -i 's/#deleteifhttps//' $vHostEdit
 
       elif [ -z "$phpUsed" ]; then
         phpUsed=$(cat $vHostEdit | grep proxy_pass)
 
         if [ -n "$phpUsed" ]; then
+          sed -i '/#deleteifhttps/d' $vHostEdit
           sed -i '/#end/d' $vHostEdit
-          cat base_vhost/nginx/phpreverse >> $vHostEdit
+          cat base_vhost/nginx/phpreverse >> "$vHostEdit"
           sed -i 's/${ipToSend}/'$ipToSend'/' "$vHostEdit"
           sed -i 's/${portToSend}/'$portToSend'/' "$vHostEdit"
+          sed -i 's/#deleteifhttps//' $vHostEdit
         fi
       fi
 

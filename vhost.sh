@@ -129,7 +129,7 @@ if [ $doNginx == "y" ]; then
 
     if [ -n "$portToSend" ] && [ -n "$ipToSend" ]; then
       echo portToSend="$portToSend" >> generated_vhost/"$vHostNginx".variables
-      echo portToSend="$ipToSend">> generated_vhost/"$vHostNginx".variables
+      echo ipToSend="$ipToSend">> generated_vhost/"$vHostNginx".variables
     fi
 
     if [ -n "$phpVersion" ]; then

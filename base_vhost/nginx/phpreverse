@@ -1,9 +1,9 @@
 
-    location ~ \.php$ {
-        proxy_pass http://${ipToSend}:${portToSend};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+    location ~ \.php$ { #deleteifhttps
+        proxy_pass http://${ipToSend}:${portToSend}; #deleteifhttps
+        proxy_set_header Host $host; #deleteifhttps
+        proxy_set_header X-Real-IP $remote_addr; #deleteifhttps
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; #deleteifhttps
+        proxy_set_header X-Forwarded-Proto $scheme; #deleteifhttps
+    } #deleteifhttps
 } #end (comment needed for script)
