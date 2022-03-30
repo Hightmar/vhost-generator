@@ -91,7 +91,7 @@ if [ $cerbotUsed == "y" ]; then
         sed -i '/#end/d' $vHostEdit
         cat base_vhost/nginx/php >> $vHostEdit
         sed -i 's/${phpVersion}/'$phpVersion'/' $vHostEdit
-        sed -i 's/#deleteifhttps//' $vHostEdit
+        sed -i 's/ #deleteifhttps//' $vHostEdit
 
       elif [ -z "$phpUsed" ]; then
         phpUsed=$(cat $vHostEdit | grep proxy_pass)
@@ -102,7 +102,7 @@ if [ $cerbotUsed == "y" ]; then
           cat base_vhost/nginx/phpreverse >> "$vHostEdit"
           sed -i 's/${ipToSend}/'$ipToSend'/' "$vHostEdit"
           sed -i 's/${portToSend}/'$portToSend'/' "$vHostEdit"
-          sed -i 's/#deleteifhttps//' $vHostEdit
+          sed -i 's/ #deleteifhttps//' $vHostEdit
         fi
       fi
 
