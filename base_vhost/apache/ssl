@@ -15,7 +15,6 @@
    SSLCertificateFile      /etc/letsencrypt/live/${serverName}/fullchain.pem
    SSLCertificateKeyFile   /etc/letsencrypt/${serverName}/privkey.pem
 
-
 #hsts   Header always set Strict-Transport-Security "max-age=63072000"
    Header set X-Content-Type-Options nosniff
    Header set X-XSS-Protection "1; mode=block"
